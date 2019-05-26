@@ -2,94 +2,113 @@
 #'
 #' Given a vector containing all parameters of interest and a cost function, the \code{FAMoS} looks for the most appropriate subset model to describe the given data.
 #' @param init.par A named vector containing the initial parameter values.
-#' @param fit.fn A cost function. Has to take the complete parameter vector as an input (needs to be names \code{parms}) and must return the corresponding negative log-likelihood (-2LL, see Burnham and Anderson 2002). The binary vector, containing the information which parameters are currently fitted, can also be used by taking \code{binary} as an additional function input argument.
-#' @param nr.of.data The number of data points used for fitting.
+#' @param fit.fn A cost function. Has to take the complete parameter vector as an input (needs to be names \code{parms}) and must return a selection criterion value (e.g. AICc or BIC). See Details for more information.
 #' @param homedir The directory to which the results should be saved to.
 #' @param do.not.fit The names of the parameters that are not supposed to be fitted. Default is NULL.
 #' @param method The starting method of the FAMoS. Options are "forward" (forward search), "backward" (backward elimination) and "swap" (only if \code{critical.parameters} or \code{swap.parameters} are supplied). Methods are adaptively changed over each iteration of the FAMoS. Default to "forward".
-#' @param init.model.type The starting model. Options are "global" (starts with the complete model) or "random" (creates a randomly sampled starting model). Alternatively, a specific model can be used by giving the corresponding names of the parameters one wants to start with. Default to "random".
+#' @param init.model.type The starting model. Options are "global" (starts with the complete model), "random" (creates a randomly sampled starting model) or "most.distant" (uses the model most dissimilar from all other previously tested models). Alternatively, a specific model can be used by giving the corresponding names of the parameters one wants to start with. Default to "random".
 #' @param refit If TRUE, previously tested models will be tested again. Default to FALSE.
-#' @param optim.runs The number of times that each model will be fitted by \code{\link{optim}}. Default to 5.
-#' @param information.criterion The information criterion the model selection will be based on. Options are "AICc", "AIC" and "BIC". Default to "AICc".
+#' @param use.optim Logical. If true, the cost function \code{fit.fn} will be fitted via \code{\link{optim}}. If FALSE, the cost function will only be evaluated.
+#' @param optim.runs The number of times that each model will be optimised. Default to 1. Numbers larger than 1 use random initial conditions (see \code{random.borders}).
 #' @param default.val A named list containing the values that the non-fitted parameters should take. If NULL, all non-fitted parameters will be set to zero. Default values can be either given by a numeric value or by the name of the corresponding parameter the value should be inherited from (NOTE: In this case the corresponding parameter entry has to contain a numeric value). Default to NULL.
 #' @param swap.parameters A list specifying which parameters are interchangeable. Each swap set is given as a vector containing the names of the respective parameters. Default to NULL.
 #' @param critical.parameters A list specifying sets of critical parameters. Critical sets are parameters sets, of which at least one parameter per set has to be present in each tested model. Default to NULL.
 #' @param random.borders The ranges from which the random initial parameter conditions for all \code{optim.runs} larger than one are sampled. Can be either given as a vector containing the relative deviations for all parameters or as a matrix containing in its first column the lower and in its second column the upper border values. Parameters are uniformly sampled based on \code{\link{runif}}. Default to 1 (100\% deviation of all parameters). Alternatively, functions such as \code{\link{rnorm}}, \code{\link{rchisq}}, etc. can be used if the additional arguments are passed along as well.
 #' @param control.optim Control parameters passed along to \code{optim}. For more details, see \code{\link{optim}}.
 #' @param parscale.pars Logical. If TRUE, the \code{parscale} option will be used when fitting with \code{\link{optim}}. This can help to speed up the fitting procedure, if the parameter values are on different scales. Default to FALSE.
-#' @param con.tol The relative convergence tolerance. \code{famos} will rerun \code{\link{optim}} until the relative improvement between the current and the last fit is less than \code{con.tol}. Default is set to 0.01, meaning the fitting will terminate if the improvement is less than 1\% of the previous value.
-#' @param save.performance Logical. If TRUE, the performance of \code{FAMoS} will be evaluated in each iteration via \code{\link{famos.performance}}, which will save the corresponding plot into the folder "FAMoS-Results/Figures/" (starting from iteration 3) and simultaneously show it on screen. Default to TRUE.
-#' @param future.off Logical. If TRUE, FAMoS runs without the use of \code{futures}. Useful for debugging.
+#' @param con.tol The absolute convergence tolerance of each fitting run (see Details). Default is set to 0.1.
+#' @param save.performance Logical. If TRUE, the performance of \code{FAMoS} will be evaluated in each iteration via \code{\link{famos.performance}}, which will save the corresponding plots into the folder "FAMoS-Results/Figures/" (starting from iteration 3) and simultaneously show it on screen. Default to TRUE.
+#' @param future.off Logical. If TRUE (default), FAMoS runs without the use of \code{futures}.
 #' @param log.interval The interval (in seconds) at which FAMoS informs about the current status, i.e. which models are still running and how much time has passed. Default to 600 (= 10 minutes).
+#' @param verbose Logical. If TRUE, FAMoS will output all details about the current fitting procedure.
 #' @param ... Other arguments that will be passed along to \code{\link{future}}, \code{\link{optim}} or the user-specified cost function \code{fit.fn}.
 #' @details In each iteration, the FAMoS finds all neighbouring models based on the current model and method, and subsequently tests them. If one of the tested models performs better than the current model, the model, but not the method, will be updated. Otherwise, the method, but not the model, will be adaptively changed, depending on the previously used methods.
+#'
+#' The cost function \code{fit.fn} can take the following inputs:
+#' \describe{
+#'   \item{parms}{A named vector containing all parameter values. This input is mandatory. If \code{use.optim = TRUE}, FAMos will automatically subset the complete parameter set into fitted and non-fitted parameters.}
+#'   \item{binary}{Optional input. The binary vector contains the information which parameters are currently fitted. Fitted parameters are set to 1, non-fitted to 0. This input can be to split the complete parameter set into fitted and non-fitted parameters if a customised optimisation function is used (see \code{use.optim}).}
+#'   \item{...}{Other parameters that can should be passed to \code{fit.fn}}
+#'   }
+#'
+#'If \code{use.optim = TRUE}, the cost function needs to return a single numeric value, which corresponds to the selection criterion value. However, if \code{use.optim = FALSE}, the cost function needs to return a list containing in its first entry the selection criterion value and in its second entry the named vector of the fitted parameter values (non-fitted parameters are internally assessed).
+#'
 #' @export
 #' @return A list containing the following elements:
 #' \describe{
-#'   \item{IC}{The value of the information criterion of the best model.}
+#'   \item{SCV}{The value of the selection criterion of the best model.}
 #'   \item{par}{The values of the fitted parameter vector corresponding to the best model.}
-#'   \item{IC.type}{The type of information criterion used.}
 #'   \item{binary}{The binary information of the best model.}
 #'   \item{vector}{Vector indicating which parameters were fitted in the best model.}
 #'   \item{total.models.tested}{The total number of different models that were analysed. May include repeats.}
-#'    \item{mrun}{The number of the current FAMoS run.}
+#'   \item{mrun}{The number of the current FAMoS run.}
 #'   \item{initial.model}{The first model evaluated by the FAMoS run.}
 #'   }
 #' @examples
-#' future::plan(future::sequential)
 #'
 #' #setting data
-#' x.values <- 1:7
-#' y.values <-  3^2 * x.values^2 - exp(2 * x.values)
+#' true.p2 <- 3
+#' true.p5 <- 2
+#' sim.data <- cbind.data.frame(range = 1:10,
+#'                              y = true.p2^2 * (1:10)^2 - exp(true.p5 * (1:10)))
 #'
-#' #define initial conditions and corresponding test function
+#' #define initial parameter values and corresponding test function
 #' inits <- c(p1 = 3, p2 = 4, p3 = -2, p4 = 2, p5 = 0)
 #'
-#' cost_function <- function(parms, x.vals, y.vals){
-#'  if(max(abs(parms)) > 5){
-#'    return(NA)
-#'  }
-#'  with(as.list(c(parms)), {
-#'    res <- 4*p1 + p2^2*x.vals^2 + p3*sin(x.vals) + p4*x.vals - exp(p5*x.vals)
-#'    diff <- sum((res - y.vals)^2)
-#'  })
+#' cost_function <- function(parms, binary, data){
+#'   if(max(abs(parms)) > 5){
+#'     return(NA)
+#'   }
+#'   with(as.list(c(parms)), {
+#'     res <- p1*4 + p2^2*data$range^2 + p3*sin(data$range) + p4*data$range - exp(p5*data$range)
+#'     diff <- sum((res - data$y)^2)
+#'
+#'     #calculate AICC
+#'     nr.par <- length(which(binary == 1))
+#'     nr.data <- nrow(data)
+#'     AICC <- diff + 2*nr.par + 2*nr.par*(nr.par + 1)/(nr.data - nr.par -1)
+#'
+#'     return(AICC)
+#'   })
 #' }
+#'
 #'
 #' #set swap set
 #' swaps <- list(c("p1", "p5"))
 #'
 #' #perform model selection
-#' res <- famos(init.par = inits,
-#'             fit.fn = cost_function,
-#'             nr.of.data = length(y.values),
-#'             homedir = getwd(),
-#'             method = "swap",
-#'             swap.parameters = swaps,
-#'             init.model.type = c("p1", "p3"),
-#'             optim.runs = 1,
-#'             x.vals = x.values,
-#'             y.vals = y.values)
+#' famos(init.par = inits,
+#'       fit.fn = cost_function,
+#'       homedir = tempdir(),
+#'       method = "swap",
+#'       swap.parameters = swaps,
+#'       init.model.type = c("p1", "p3"),
+#'       optim.runs = 1,
+#'       data = sim.data)
+#'
+#' #delete tempdir
+#' unlink(paste0(tempdir(),"/FAMoS-Results"), recursive = TRUE)
 
 famos <- function(init.par,
                   fit.fn,
-                  nr.of.data,
                   homedir = getwd(),
                   do.not.fit = NULL,
                   method = "forward",
                   init.model.type = "random",
                   refit = FALSE,
+                  use.optim = TRUE,
                   optim.runs = 5,
-                  information.criterion = "AICc",
                   default.val = NULL,
                   swap.parameters = NULL,
                   critical.parameters = NULL,
                   random.borders = 1,
                   control.optim = list(maxit = 1000),
                   parscale.pars = FALSE,
-                  con.tol = 0.01,
+                  con.tol = 0.1,
                   save.performance = TRUE,
-                  future.off = FALSE,
+                  future.off = TRUE,
                   log.interval = 600,
+                  verbose = FALSE,
                   ...
 ) {
   #test the appropriateness of parameters
@@ -111,9 +130,6 @@ famos <- function(init.par,
   if(is.null(swap.parameters) == FALSE && is.list(swap.parameters) == FALSE){
     stop("swap.parameters must be a list.")
   }
-  if(information.criterion == "AICc" && nr.of.data <= (length(init.par) + 1) ){
-    stop("Due to insufficient data the AICc cannot be calculated. Choose 'AIC' or 'BIC' instead.")
-  }
   if(method != "forward" && method != "backward" && method != "swap"){
     stop("Incorrect method name! Use either 'forward', 'backward' or 'swap'.")
   }
@@ -126,6 +142,11 @@ famos <- function(init.par,
   if(is.vector(random.borders) == FALSE && is.matrix(random.borders) == FALSE){
     stop("random.borders must either be a number, a vector or a matrix.")
   }
+
+  #reset graphical parameters on exit
+  old.par <- graphics::par("mfrow")
+  on.exit(graphics::par(mfrow = old.par))
+
   cat("\nInitializing...", sep = "\n")
 
   #set starting time
@@ -133,7 +154,24 @@ famos <- function(init.par,
   #create FAMoS directory
   cat("Create FAMoS directory...", sep = "\n")
   make.directories(homedir)
+  if(file.exists(paste0(homedir, "/FAMoS-Results/FAMoS-Info.rds"))){
+    old.session <- readRDS(paste0(homedir, "/FAMoS-Results/FAMoS-Info.rds"))
+    if(is.character(all.equal(fit.fn, old.session$fit.function))){
+      user.input <- readline(cat("The previous results were generated by a different cost function and might therefore not be usable during this run. What should FAMoS do?\n 1) Continue anyway   2) Delete old results and continue   3) Halt\nEnter number here:"))
+      switch (user.input,
+        "1" = {},
+        "2" = {unlink(paste0(homedir, "/FAMoS-Results"),recursive = TRUE)
+               make.directories(homedir)
+               famos.session <- list(fit.function = fit.fn)
+               saveRDS(famos.session,paste0(homedir, "/FAMoS-Results/FAMoS-Info.rds"))},
+        {stop("FAMos halted.")}
+      )
 
+    }
+  }else{
+    famos.session <- list(fit.function = fit.fn)
+    saveRDS(famos.session,paste0(homedir, "/FAMoS-Results/FAMoS-Info.rds"))
+  }
   #get mrun for unique labelling of this run
   mrun_old <- list.files(path = paste0(homedir, "/FAMoS-Results/TestedModels/"),
                          pattern = "TestedModels.*.rds")
@@ -181,7 +219,7 @@ famos <- function(init.par,
   scaling.values <- abs(init.par)
   scaling.values[scaling.values == 0] <- 1
 
-  if(length(init.model.type) == 1 && (init.model.type == "global" || init.model.type == "random")){
+  if(length(init.model.type) == 1 && (init.model.type == "global" || init.model.type == "random" || init.model.type == "most.distant")){
     switch (init.model.type,
             "global" = {
               #take the global model
@@ -195,6 +233,17 @@ famos <- function(init.par,
               init.model <- random.init.model(number.par = length(init.par),
                                               crit.parms = crit.parms,
                                               no.fit = do.not.fit)
+            },
+            "most.distant" = {
+              #check if previous files exist
+              filenames <- list.files(paste0(homedir,"/FAMoS-Results/TestedModels/"),
+                                      pattern="*.rds",
+                                      full.names=TRUE)
+              if(length(filenames) == 0){
+                stop("No previously tested models available. Please use another option for init.model.type.")
+              }
+              #get a random initial model
+              init.model <- which(get.most.distant(input = homedir)[[3]] == 1)
             }
     )
   }else{
@@ -221,19 +270,8 @@ famos <- function(init.par,
   models.tested <- c()
   saveRDS(models.tested, paste0(homedir, "/FAMoS-Results/TestedModels/TestedModels",mrun,".rds"))
   models.per.run <- c()
-  #create storage for AICCs for the tested models
-  save.AICC <- c()
-
-  # determine which information criterion to use for model comparison and print out
-  switch(information.criterion,
-         "AICc" = {
-           ic <- 1
-         }, "AIC" = {
-           ic <- 2
-         }, "BIC" = {
-           ic <- 3
-         })
-  cat(paste0("Information criterion for model comparison: ", information.criterion), sep = "\n")
+  #create storage for SCVs for the tested models
+  save.SCV <- c()
 
   #print if refitting is enabled or not
   if(refit) {
@@ -289,7 +327,10 @@ famos <- function(init.par,
         curr.model.all <- c()
         for(j in 1:length(parms.left)){
           #print tested parameter
-          cat(paste0("Add parameter ", all.names[parms.left[j]]), sep = "\n")
+          if(verbose){
+            cat(paste0("Add parameter ", all.names[parms.left[j]]), sep = "\n")
+          }
+
 
           #get the indices of the currently tested parameter set
           pick.model <- c(parms.left[j], pick.model.prev)
@@ -300,12 +341,18 @@ famos <- function(init.par,
 
           #test if model violates the critical conditions
           if(model.appr(pick.model, crit.parms, do.not.fit = do.not.fit) == FALSE){
-            cat(paste("Model ", paste0(curr.model, collapse=""), " violates critical parameter specifications. Model skipped."), sep = "\n")
+            if(verbose){
+              cat(paste("Model ", paste0(curr.model, collapse=""), " violates critical parameter specifications. Model skipped."), sep = "\n")
+            }
+
             next
           }
           #check if model has been tested before
           if(is.element(0,colSums(abs(models.tested-curr.model))) && refit==FALSE){
-            cat("Combination has been tested before", sep = "\n")
+            if(verbose){
+              cat("Combination has been tested before", sep = "\n")
+            }
+
             next
           }
           #if model was neither skipped nor tested before, add to the testing catalogue
@@ -326,7 +373,10 @@ famos <- function(init.par,
         curr.model.all <- c()
         #get all suitable parameter combinations
         for(j in 1:length(parms.left)){
-          cat(paste0("Remove parameter ", all.names[parms.left[j]]), sep = "\n")
+          if(verbose){
+            cat(paste0("Remove parameter ", all.names[parms.left[j]]), sep = "\n")
+          }
+
 
           # pick.model <- c(sample(x = samp.vec[-pick.model.prev], size = 1), pick.model.prev)
           pick.model <- c(parms.left[-j])
@@ -337,13 +387,19 @@ famos <- function(init.par,
 
           #test if model violates the critical conditions
           if(model.appr(pick.model, crit.parms, do.not.fit = do.not.fit) == FALSE){
-            cat(paste("Model ", paste0(curr.model, collapse=""), " violates critical parameter specifications. Model skipped."), sep = "\n")
+            if(verbose){
+              cat(paste("Model ", paste0(curr.model, collapse=""), " violates critical parameter specifications. Model skipped."), sep = "\n")
+            }
+
             nosub <- c(nosub, j)
             next
           }
           #check if model has been tested before
           if(is.element(0,colSums(abs(models.tested-curr.model))) && refit==FALSE){
-            cat("Combination has been tested before", sep = "\n")
+            if(verbose){
+              cat("Combination has been tested before", sep = "\n")
+            }
+
             nosub <- c(nosub, j)
             next
           }
@@ -395,17 +451,26 @@ famos <- function(init.par,
               curr.model[pick.model.prev] <- 1
               curr.model[as.numeric(cmb[j,])] <- abs(curr.model[as.numeric(cmb[j,])]-1)
 
-              cat(paste0("Replace ", all.names[parms.left[j,1]], " by ", all.names[parms.left[j,2]], "\n"))
+              if(verbose){
+                cat(paste0("Replace ", all.names[cmb[j,1]], " by ", all.names[cmb[j,2]], "\n"))
+              }
+
               #check if model has been tested before while refitting is not enabled
               if(is.element(0,colSums(abs(models.tested-curr.model))) && refit==FALSE){
-                cat("Combination has been tested before", sep = "\n")
+                if(verbose){
+                  cat("Combination has been tested before", sep = "\n")
+                }
+
                 next
               }
 
               #test if model violates the critical conditions
               pick.model <- which(curr.model != 0)
               if(model.appr(pick.model, crit.parms,do.not.fit = do.not.fit) == FALSE){
-                cat(paste("Model ", paste0(curr.model, collapse=""), " violates critical parameter specifications. Model skipped."), sep = "\n")
+                if(verbose){
+                  cat(paste("Model ", paste0(curr.model, collapse=""), " violates critical parameter specifications. Model skipped."), sep = "\n")
+                }
+
                 next
               }
 
@@ -425,7 +490,7 @@ famos <- function(init.par,
                              timediff %% 3600 %/% 60,  # minutes
                              timediff %% 60 %/% 1), # seconds,
                      sep = "\n"))
-          final.results <- return.results(homedir, mrun, ic = information.criterion)
+          final.results <- return.results(homedir, mrun)
           #setwd(old.directory)
           return(final.results)
         }
@@ -453,7 +518,7 @@ famos <- function(init.par,
       model.run <- model.run + 1
       models.tested <- cbind(models.tested, curr.model.all)
       models.per.run <- cbind(models.per.run, rbind(model.run, curr.model.all))
-      save.AICC <- cbind(save.AICC, NA)
+      save.SCV <- cbind(save.SCV, NA)
       next
     }
 
@@ -469,12 +534,19 @@ famos <- function(init.par,
                        timediff %% 60 %/% 1), # seconds,
                sep = "\n"))
 
-    cat("Job submission:", sep = "\n")
+    if(verbose){
+      cat("Job submission:", sep = "\n")
+    }
+
     #Job submission####
     #submit each individual model to the cluster if it hasn't been tested before
     for(j in 1:ncol(curr.model.all)){
       if(file.exists(paste0(homedir, "/FAMoS-Results/Fits/Model",paste(curr.model.all[,j], collapse =""), ".rds")) == FALSE  ||  refit){
-        cat(paste0("Job ID for model ", formatC(j, width = 2, format = "d", flag = "0"), " - ", paste(curr.model.all[,j], collapse="")), sep = "\n")
+
+        if(verbose){
+          cat(paste0("Job ID for model ", formatC(j, width = 2, format = "d", flag = "0"), " - ", paste(curr.model.all[,j], collapse="")), sep = "\n")
+        }
+
 
         if(future.off == F){
           assign(paste0("model",j),
@@ -482,16 +554,16 @@ famos <- function(init.par,
                    base.optim(binary = curr.model.all[,j],
                               parms = best.par,
                               fit.fn = fit.fn,
-                              nr.of.data = nr.of.data,
                               homedir = homedir,
+                              use.optim = use.optim,
                               optim.runs = optim.runs,
-                              information.criterion = information.criterion,
                               default.val = default.val,
                               random.borders = random.borders,
                               control.optim = control.optim,
                               parscale.pars = parscale.pars,
                               scaling = scaling.values,
                               con.tol = con.tol,
+                              verbose = verbose,
                               ...)
                  },
                  label = paste0("Model", paste(curr.model.all[,j], collapse ="")),
@@ -502,23 +574,26 @@ famos <- function(init.par,
           base.optim(binary = curr.model.all[,j],
                      parms = best.par,
                      fit.fn = fit.fn,
-                     nr.of.data = nr.of.data,
                      homedir = homedir,
+                     use.optim = use.optim,
                      optim.runs = optim.runs,
-                     information.criterion = information.criterion,
                      default.val = default.val,
                      random.borders = random.borders,
                      control.optim = control.optim,
                      parscale.pars = parscale.pars,
                      scaling = scaling.values,
                      con.tol = con.tol,
+                     verbose = verbose,
                      ...)
         }
 
 
       }else{
         assign(paste0("model",j), "no.refit")
-        cat(paste0("Model fit for ", paste(curr.model.all[,j], collapse="")," exists and refitting is not enabled."), sep = "\n")
+        if(verbose){
+          cat(paste0("Model fit for ", paste(curr.model.all[,j], collapse="")," exists and refitting is not enabled."), sep = "\n")
+        }
+
       }
     }
 
@@ -542,6 +617,12 @@ famos <- function(init.par,
             waiting <- TRUE
           }else{
 
+            if(class(try(future::value(get(paste0("model", j)), std = FALSE))) == "try-error"){
+              stop(paste0("Future failed. The corresponding error message of job ",
+                          paste(curr.model.all[,j], collapse=""),
+                          " is shown above. If no output is shown, use 'future.off = TRUE' to debug."))
+            }
+
             #check if output was generated, including waiting period if the cluster is very busy
             if(!file.exists(paste0(homedir,
                                    "/FAMoS-Results/Fits/Model",
@@ -554,30 +635,11 @@ famos <- function(init.par,
                                    "/FAMoS-Results/Fits/Model",
                                    paste(curr.model.all[,j], collapse=""),
                                    ".rds"))){
-              assign(paste0("model",j),
-                     future::future({
-                       base.optim(binary = curr.model.all[,j],
-                                  parms = best.par,
-                                  fit.fn = fit.fn,
-                                  nr.of.data = nr.of.data,
-                                  homedir = homedir,
-                                  optim.runs = optim.runs,
-                                  information.criterion = information.criterion,
-                                  default.val = default.val,
-                                  random.borders = random.borders,
-                                  control.optim = control.optim,
-                                  parscale.pars = parscale.pars,
-                                  scaling = scaling.values,
-                                  con.tol = con.tol,
-                                  ...)
-                     },
-                     label = paste0("Model", paste(curr.model.all[,j], collapse ="")),
-                     ...
-                     )
-              )
-              cat(paste0("Future terminated but no output file was generated. Model ",j," was automatically resubmitted. If this message repeats, check the log file for more information or use 'future.off = TRUE' to debug."), sep = "\n")
 
-              waiting <- TRUE
+
+              stop("Future is done but no output file to job ",
+                   paste(curr.model.all[,j], collapse=""),
+                   " was created. FAMoS halted.")
             }else{
               #update waiting variable
               waiting <- waiting || FALSE
@@ -626,7 +688,7 @@ famos <- function(init.par,
       }
     }
     #read in files
-    get.AICC <- c()
+    get.SCV <- c()
     cat("Evaluate results ...", sep = "\n")
     for(j in 1:ncol(curr.model.all)){
 
@@ -650,77 +712,98 @@ famos <- function(init.par,
       options(warn=0)
 
       #waiting is over, read out file
-      get.AICC <- cbind(get.AICC,
+      get.SCV <- cbind(get.SCV,
                         readRDS(paste0(homedir,
                                        "/FAMoS-Results/Fits/Model",
                                        paste(curr.model.all[,j], collapse =""),
                                        ".rds")))
     }
 
-    #save the resulted AICcs
+    #save the resulted SCVs
 
-    Aicc <- get.AICC[1:3,]
-    save.AICC <- cbind(save.AICC, Aicc)
+    SCV <- get.SCV[1,]
+    save.SCV <- c(save.SCV, SCV)
 
-    #save AICcs with the corresponding models
-    saveTestedModels <- rbind(save.AICC, models.per.run)
-    row.names(saveTestedModels) <- c("AICc", "AIC", "BIC", "iteration", all.names)
+    #save SCVs with the corresponding models
+    saveTestedModels <- rbind(save.SCV, models.per.run)
+    row.names(saveTestedModels) <- c("SCV", "iteration", all.names)
     colnames(saveTestedModels) <- 1:length(colnames(saveTestedModels))
     saveRDS(saveTestedModels, paste0(homedir, "/FAMoS-Results/TestedModels/TestedModels",mrun,".rds"))
 
     #if more than one model was tested, order them according to their performance
-    if(ncol(get.AICC) > 1){
-      index.AICC <- which(get.AICC[ic,] == min(get.AICC[ic,]))[1]
-      get.AICC <- get.AICC[,order(get.AICC[ic,])]
-      get.AICC <- as.numeric(get.AICC[,1])
+    if(ncol(get.SCV) > 1){
+      index.SCV <- which.min(get.SCV[1,])
+      get.SCV <- get.SCV[,order(get.SCV[1,])]
+      get.SCV <- as.numeric(get.SCV[,1])
     } else {
-      index.AICC <- 1
-      get.AICC <- as.numeric(get.AICC[,1])
+      index.SCV <- 1
+      get.SCV <- as.numeric(get.SCV[,1])
     }
 
-    names(get.AICC) <- c("AICc", "AIC", "BIC", all.names)
+    names(get.SCV) <- c("SCV", all.names)
 
     #print currently best fit
-    curr.AICC <- get.AICC[ic]
-    cat(paste0("Best ", information.criterion, " of this run is ",round(curr.AICC,2)), sep = "\n")
+    curr.SCV <- get.SCV[1]
+    cat(paste0("Best selection criterion value of this run is ",round(curr.SCV,2)), sep = "\n")
 
     #update if new model is better
     if(model.run == 1){
-      old.AICC <- curr.AICC
-      pick.model.prev <- which(curr.model.all[,index.AICC] == 1)
-      best.par <- get.AICC[-c(1:3)]
+      old.SCV <- curr.SCV
+      pick.model.prev <- which(curr.model.all[,index.SCV] == 1)
+      best.par <- get.SCV[-1]
 
-      bm.bin <- curr.model.all[,index.AICC]
+      bm.bin <- curr.model.all[,index.SCV]
 
-      saveRDS(get.AICC, paste0(homedir, "/FAMoS-Results/BestModel/BestModel",mrun,".rds"))
+      saveRDS(get.SCV, paste0(homedir,
+                               "/FAMoS-Results/BestModel/BestModel",
+                               mrun,
+                               ".rds"))
 
     }else{# if it's not the first run, we know what the previous and current method are
-      if((curr.AICC) < old.AICC ){#update the model if a better model is found
-        old.AICC <- curr.AICC
-        pick.model.prev <- which(curr.model.all[,index.AICC] == 1)
-        best.par <- get.AICC[-c(1:3)]
 
-        bm.bin <- curr.model.all[,index.AICC]
+      #save FAMoS performance
+      if(ncol(saveTestedModels) > 3){
+
+        if(save.performance == T){
+          famos.performance(input = saveTestedModels,
+                            path = homedir,
+                            save.output = paste0(homedir,
+                                                 "/FAMoS-Results/Figures/Performance",
+                                                 mrun,
+                                                 ".pdf"))
+        }
+
+        famos.performance(input = saveTestedModels,
+                          path = homedir)
+
+      }
+
+      if((curr.SCV) < old.SCV ){#update the model if a better model is found
+        old.SCV <- curr.SCV
+        pick.model.prev <- which(curr.model.all[,index.SCV] == 1)
+        best.par <- get.SCV[-1]
+
+        bm.bin <- curr.model.all[,index.SCV]
 
         #update previous and current method and output everything to the log file
         switch(method, "forward" = {
           previous <- "forward"
           method <- "forward"
-          cat(paste0("Parameter ", all.names[parms.left[index.AICC]], " was added"), sep = "\n")
+          cat(paste0("Parameter ", all.names[parms.left[index.SCV]], " was added"), sep = "\n")
         }, "backward" = {
           previous <- "backward"
           method <- "backward"
-          cat(paste0("Parameter ", all.names[parms.left[index.AICC]], " was removed"), sep = "\n")
+          cat(paste0("Parameter ", all.names[parms.left[index.SCV]], " was removed"), sep = "\n")
         }, "swap" = {
           previous <- "swap"
           method <- "forward"
-          cat(paste0("Parameter ", all.names[parms.left[index.AICC,2]], " was exchanged for ", all.names[parms.left[index.AICC,1]]), sep = "\n")
+          cat(paste0("Parameter ", all.names[parms.left[index.SCV,2]], " was exchanged for ", all.names[parms.left[index.SCV,1]]), sep = "\n")
           cat(paste0("Switch to method '", method, "'"), sep = "\n")
         }
         )
 
-        #save best AICc
-        saveRDS(get.AICC, paste0(homedir, "/FAMoS-Results/BestModel/BestModel",mrun,".rds"))
+        #save best SCV
+        saveRDS(get.SCV, paste0(homedir, "/FAMoS-Results/BestModel/BestModel",mrun,".rds"))
 
       }else{# if method did not return a better result
         switch(method, "forward" = {#if forward failed
@@ -731,7 +814,7 @@ famos <- function(init.par,
               method <- "swap"
             }else{
               cat("Best model found. Algorithm stopped.", sep = "\n")
-              final.results <- return.results(homedir, mrun, ic = information.criterion)
+              final.results <- return.results(homedir, mrun)
 
               timediff <- difftime(Sys.time(),start, units = "secs")[[1]]
               cat(paste0("Time needed: ",
@@ -741,7 +824,26 @@ famos <- function(init.par,
                                  timediff %% 60 %/% 1), # seconds,
                          sep = "\n"))
 
-              #setwd(old.directory)
+              graphics::par(mfrow = c(1,2))
+              sc.order(input = saveTestedModels,
+                       mrun = mrun)
+
+              aicc.weights(input = saveTestedModels,
+                           mrun = mrun,
+                           reorder = TRUE)
+
+              if(save.performance == T){
+                sc.order(input = saveTestedModels,
+                         mrun = mrun,
+                         save.output = paste0(homedir,"/FAMoS-Results/Figures/ModelComparison",mrun,".pdf"))
+
+                aicc.weights(input = saveTestedModels,
+                             mrun = mrun,
+                             reorder = TRUE,
+                             save.output = paste0(homedir,"/FAMoS-Results/Figures/AkaikeWeights",mrun,".pdf"))
+              }
+
+
               return(final.results)
             }
           }else if(previous == "swap"){
@@ -756,7 +858,7 @@ famos <- function(init.par,
             }else{
               cat("Best model found. Algorithm stopped.", sep = "\n")
 
-              final.results <- return.results(homedir, mrun, ic = information.criterion)
+              final.results <- return.results(homedir, mrun)
               timediff <- difftime(Sys.time(),start, units = "secs")[[1]]
               cat(paste0("Time needed: ",
                          sprintf("%02d:%02d:%02d",
@@ -764,7 +866,26 @@ famos <- function(init.par,
                                  timediff %% 3600 %/% 60,  # minutes
                                  timediff %% 60 %/% 1), # seconds,
                          sep = "\n"))
-              #setwd(old.directory)
+
+              graphics::par(mfrow = c(1,2))
+              sc.order(input = saveTestedModels,
+                       mrun = mrun)
+
+              aicc.weights(input = saveTestedModels,
+                           mrun = mrun,
+                           reorder = TRUE)
+
+              if(save.performance == T){
+                sc.order(input = saveTestedModels,
+                         mrun = mrun,
+                         save.output = paste0(homedir,"/FAMoS-Results/Figures/ModelComparison",mrun,".pdf"))
+
+                aicc.weights(input = saveTestedModels,
+                             mrun = mrun,
+                             reorder = TRUE,
+                             save.output = paste0(homedir,"/FAMoS-Results/Figures/AkaikeWeights",mrun,".pdf"))
+              }
+
               return(final.results)
             }
 
@@ -776,7 +897,7 @@ famos <- function(init.par,
         }, "swap" = {#if swap failed
           # algorithm ends once swap method fails
           cat("Best model found. Algorithm stopped.", sep = "\n")
-          final.results <- return.results(homedir, mrun, ic = information.criterion)
+          final.results <- return.results(homedir, mrun)
           timediff <- difftime(Sys.time(),start, units = "secs")[[1]]
           cat(paste0("Time needed: ",
                      sprintf("%02d:%02d:%02d",
@@ -784,7 +905,26 @@ famos <- function(init.par,
                              timediff %% 3600 %/% 60,  # minutes
                              timediff %% 60 %/% 1), # seconds,
                      sep = "\n"))
-          #setwd(old.directory)
+
+          graphics::par(mfrow = c(1,2))
+          sc.order(input = saveTestedModels,
+                   mrun = mrun)
+
+          aicc.weights(input = saveTestedModels,
+                       mrun = mrun,
+                       reorder = TRUE)
+
+          if(save.performance == T){
+            sc.order(input = saveTestedModels,
+                     mrun = mrun,
+                     save.output = paste0(homedir,"/FAMoS-Results/Figures/ModelComparison",mrun,".pdf"))
+
+            aicc.weights(input = saveTestedModels,
+                         mrun = mrun,
+                         reorder = TRUE,
+                         save.output = paste0(homedir,"/FAMoS-Results/Figures/AkaikeWeights",mrun,".pdf"))
+          }
+
           return(final.results)
 
         }
@@ -793,19 +933,7 @@ famos <- function(init.par,
       }
     }
 
-    if(save.performance == T){
-      #save FAMoS performance
-      if(ncol(saveTestedModels) > 3){
-        famos.performance(input = saveTestedModels,
-                          path = homedir,
-                          ic = information.criterion,
-                          save.output = paste0(homedir,"/FAMoS-Results/Figures/Performance",mrun,".pdf"))
 
-        famos.performance(input = saveTestedModels,
-                          path = homedir,
-                          ic = information.criterion)
-      }
-    }
 
     #update model.run
     model.run <- model.run + 1
@@ -819,5 +947,4 @@ famos <- function(init.par,
 
   }
 
-  cat("Computation completed.", sep = "\n")
 }

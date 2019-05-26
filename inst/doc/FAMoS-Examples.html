@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style type="text/css">
+@font-face {
+font-family: octicons-link;
+src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+body {
+-webkit-text-size-adjust: 100%;
+text-size-adjust: 100%;
+color: #333;
+font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+font-size: 16px;
+line-height: 1.6;
+word-wrap: break-word;
+}
+a {
+background-color: transparent;
+}
+a:active,
+a:hover {
+outline: 0;
+}
+strong {
+font-weight: bold;
+}
+h1 {
+font-size: 2em;
+margin: 0.67em 0;
+}
+img {
+border: 0;
+}
+hr {
+box-sizing: content-box;
+height: 0;
+}
+pre {
+overflow: auto;
+}
+code,
+kbd,
+pre {
+font-family: monospace, monospace;
+font-size: 1em;
+}
+input {
+color: inherit;
+font: inherit;
+margin: 0;
+}
+html input[disabled] {
+cursor: default;
+}
+input {
+line-height: normal;
+}
+input[type="checkbox"] {
+box-sizing: border-box;
+padding: 0;
+}
+table {
+border-collapse: collapse;
+border-spacing: 0;
+}
+td,
+th {
+padding: 0;
+}
+* {
+box-sizing: border-box;
+}
+input {
+font: 13px / 1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+a {
+color: #4078c0;
+text-decoration: none;
+}
+a:hover,
+a:active {
+text-decoration: underline;
+}
+hr {
+height: 0;
+margin: 15px 0;
+overflow: hidden;
+background: transparent;
+border: 0;
+border-bottom: 1px solid #ddd;
+}
+hr:before {
+display: table;
+content: "";
+}
+hr:after {
+display: table;
+clear: both;
+content: "";
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 15px;
+margin-bottom: 15px;
+line-height: 1.1;
+}
+h1 {
+font-size: 30px;
+}
+h2 {
+font-size: 21px;
+}
+h3 {
+font-size: 16px;
+}
+h4 {
+font-size: 14px;
+}
+h5 {
+font-size: 12px;
+}
+h6 {
+font-size: 11px;
+}
+blockquote {
+margin: 0;
+}
+ul,
+ol {
+padding: 0;
+margin-top: 0;
+margin-bottom: 0;
+}
+ol ol,
+ul ol {
+list-style-type: lower-roman;
+}
+ul ul ol,
+ul ol ol,
+ol ul ol,
+ol ol ol {
+list-style-type: lower-alpha;
+}
+dd {
+margin-left: 0;
+}
+code {
+font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+font-size: 12px;
+}
+pre {
+margin-top: 0;
+margin-bottom: 0;
+font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+.select::-ms-expand {
+opacity: 0;
+}
+.octicon {
+font: normal normal normal 16px/1 octicons-link;
+display: inline-block;
+text-decoration: none;
+text-rendering: auto;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+.octicon-link:before {
+content: '\f05c';
+}
+.markdown-body:before {
+display: table;
+content: "";
+}
+.markdown-body:after {
+display: table;
+clear: both;
+content: "";
+}
+.markdown-body>*:first-child {
+margin-top: 0 !important;
+}
+.markdown-body>*:last-child {
+margin-bottom: 0 !important;
+}
+a:not([href]) {
+color: inherit;
+text-decoration: none;
+}
+.anchor {
+display: inline-block;
+padding-right: 2px;
+margin-left: -18px;
+}
+.anchor:focus {
+outline: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 1em;
+margin-bottom: 16px;
+font-weight: bold;
+line-height: 1.4;
+}
+h1 .octicon-link,
+h2 .octicon-link,
+h3 .octicon-link,
+h4 .octicon-link,
+h5 .octicon-link,
+h6 .octicon-link {
+color: #000;
+vertical-align: middle;
+visibility: hidden;
+}
+h1:hover .anchor,
+h2:hover .anchor,
+h3:hover .anchor,
+h4:hover .anchor,
+h5:hover .anchor,
+h6:hover .anchor {
+text-decoration: none;
+}
+h1:hover .anchor .octicon-link,
+h2:hover .anchor .octicon-link,
+h3:hover .anchor .octicon-link,
+h4:hover .anchor .octicon-link,
+h5:hover .anchor .octicon-link,
+h6:hover .anchor .octicon-link {
+visibility: visible;
+}
+h1 {
+padding-bottom: 0.3em;
+font-size: 2.25em;
+line-height: 1.2;
+border-bottom: 1px solid #eee;
+}
+h1 .anchor {
+line-height: 1;
+}
+h2 {
+padding-bottom: 0.3em;
+font-size: 1.75em;
+line-height: 1.225;
+border-bottom: 1px solid #eee;
+}
+h2 .anchor {
+line-height: 1;
+}
+h3 {
+font-size: 1.5em;
+line-height: 1.43;
+}
+h3 .anchor {
+line-height: 1.2;
+}
+h4 {
+font-size: 1.25em;
+}
+h4 .anchor {
+line-height: 1.2;
+}
+h5 {
+font-size: 1em;
+}
+h5 .anchor {
+line-height: 1.1;
+}
+h6 {
+font-size: 1em;
+color: #777;
+}
+h6 .anchor {
+line-height: 1.1;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table,
+pre {
+margin-top: 0;
+margin-bottom: 16px;
+}
+hr {
+height: 4px;
+padding: 0;
+margin: 16px 0;
+background-color: #e7e7e7;
+border: 0 none;
+}
+ul,
+ol {
+padding-left: 2em;
+}
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+margin-top: 0;
+margin-bottom: 0;
+}
+li>p {
+margin-top: 16px;
+}
+dl {
+padding: 0;
+}
+dl dt {
+padding: 0;
+margin-top: 16px;
+font-size: 1em;
+font-style: italic;
+font-weight: bold;
+}
+dl dd {
+padding: 0 16px;
+margin-bottom: 16px;
+}
+blockquote {
+padding: 0 15px;
+color: #777;
+border-left: 4px solid #ddd;
+}
+blockquote>:first-child {
+margin-top: 0;
+}
+blockquote>:last-child {
+margin-bottom: 0;
+}
+table {
+display: block;
+width: 100%;
+overflow: auto;
+word-break: normal;
+word-break: keep-all;
+}
+table th {
+font-weight: bold;
+}
+table th,
+table td {
+padding: 6px 13px;
+border: 1px solid #ddd;
+}
+table tr {
+background-color: #fff;
+border-top: 1px solid #ccc;
+}
+table tr:nth-child(2n) {
+background-color: #f8f8f8;
+}
+img {
+max-width: 100%;
+box-sizing: content-box;
+background-color: #fff;
+}
+code {
+padding: 0;
+padding-top: 0.2em;
+padding-bottom: 0.2em;
+margin: 0;
+font-size: 85%;
+background-color: rgba(0,0,0,0.04);
+border-radius: 3px;
+}
+code:before,
+code:after {
+letter-spacing: -0.2em;
+content: "\00a0";
+}
+pre>code {
+padding: 0;
+margin: 0;
+font-size: 100%;
+word-break: normal;
+white-space: pre;
+background: transparent;
+border: 0;
+}
+.highlight {
+margin-bottom: 16px;
+}
+.highlight pre,
+pre {
+padding: 16px;
+overflow: auto;
+font-size: 85%;
+line-height: 1.45;
+background-color: #f7f7f7;
+border-radius: 3px;
+}
+.highlight pre {
+margin-bottom: 0;
+word-break: normal;
+}
+pre {
+word-wrap: normal;
+}
+pre code {
+display: inline;
+max-width: initial;
+padding: 0;
+margin: 0;
+overflow: initial;
+line-height: inherit;
+word-wrap: normal;
+background-color: transparent;
+border: 0;
+}
+pre code:before,
+pre code:after {
+content: normal;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font-size: 11px;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.pl-c {
+color: #969896;
+}
+.pl-c1,
+.pl-s .pl-v {
+color: #0086b3;
+}
+.pl-e,
+.pl-en {
+color: #795da3;
+}
+.pl-s .pl-s1,
+.pl-smi {
+color: #333;
+}
+.pl-ent {
+color: #63a35c;
+}
+.pl-k {
+color: #a71d5d;
+}
+.pl-pds,
+.pl-s,
+.pl-s .pl-pse .pl-s1,
+.pl-sr,
+.pl-sr .pl-cce,
+.pl-sr .pl-sra,
+.pl-sr .pl-sre {
+color: #183691;
+}
+.pl-v {
+color: #ed6a43;
+}
+.pl-id {
+color: #b52a1d;
+}
+.pl-ii {
+background-color: #b52a1d;
+color: #f8f8f8;
+}
+.pl-sr .pl-cce {
+color: #63a35c;
+font-weight: bold;
+}
+.pl-ml {
+color: #693a17;
+}
+.pl-mh,
+.pl-mh .pl-en,
+.pl-ms {
+color: #1d3e81;
+font-weight: bold;
+}
+.pl-mq {
+color: #008080;
+}
+.pl-mi {
+color: #333;
+font-style: italic;
+}
+.pl-mb {
+color: #333;
+font-weight: bold;
+}
+.pl-md {
+background-color: #ffecec;
+color: #bd2c00;
+}
+.pl-mi1 {
+background-color: #eaffea;
+color: #55a532;
+}
+.pl-mdr {
+color: #795da3;
+font-weight: bold;
+}
+.pl-mo {
+color: #1d3e81;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.task-list-item {
+list-style-type: none;
+}
+.task-list-item+.task-list-item {
+margin-top: 3px;
+}
+.task-list-item input {
+margin: 0 0.35em 0.25em -1.6em;
+vertical-align: middle;
+}
+:checked+.radio-label {
+z-index: 1;
+position: relative;
+border-color: #4078c0;
+}
+.sourceLine {
+display: inline-block;
+}
+code .kw { color: #000000; }
+code .dt { color: #ed6a43; }
+code .dv { color: #009999; }
+code .bn { color: #009999; }
+code .fl { color: #009999; }
+code .ch { color: #009999; }
+code .st { color: #183691; }
+code .co { color: #969896; }
+code .ot { color: #0086b3; }
+code .al { color: #a61717; }
+code .fu { color: #63a35c; }
+code .er { color: #a61717; background-color: #e3d2d2; }
+code .wa { color: #000000; }
+code .cn { color: #008080; }
+code .sc { color: #008080; }
+code .vs { color: #183691; }
+code .ss { color: #183691; }
+code .im { color: #000000; }
+code .va {color: #008080; }
+code .cf { color: #000000; }
+code .op { color: #000000; }
+code .bu { color: #000000; }
+code .ex { color: #000000; }
+code .pp { color: #999999; }
+code .at { color: #008080; }
+code .do { color: #969896; }
+code .an { color: #008080; }
+code .cv { color: #008080; }
+code .in { color: #008080; }
+</style>
+<style>
+body {
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 45px;
+  padding-top: 0px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1 id="model-selection-on-a-system-of-ordinary-differential-equations">Model selection on a system of ordinary differential equations</h1>
+<p>FAMoS was originally designed to perform model selection on systems of ODEs, which is why this tool is especially suited to tackle these kind of problems. Assume we have three different cell populations, <em>A</em>, <em>B</em> and <em>C</em>. All of these cells types can divide and therefore increase in their numbers. Furthermore, it is possible that all of these cells can turn into each other. The underlying dynamics of these cell populations can be described by a system of ordinary differential equations:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co">#define the global model dynamics</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">global.dynamics &lt;-<span class="st"> </span><span class="cf">function</span>(t,x,parms){</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">  <span class="kw">with</span>(<span class="kw">as.list</span>(<span class="kw">c</span>(x, parms)), {</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">    </a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">    dA &lt;-<span class="st"> </span>rho_A<span class="op">*</span>A <span class="op">+</span><span class="st"> </span>mu_BA<span class="op">*</span>B <span class="op">+</span><span class="st"> </span>mu_CA<span class="op">*</span>C <span class="op">-</span><span class="st"> </span>(mu_AB <span class="op">+</span><span class="st"> </span>mu_AC)<span class="op">*</span>C </a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">    dB &lt;-<span class="st"> </span>rho_B<span class="op">*</span>B <span class="op">+</span><span class="st"> </span>mu_AB<span class="op">*</span>A <span class="op">+</span><span class="st"> </span>mu_CB<span class="op">*</span>C <span class="op">-</span><span class="st"> </span>(mu_BA <span class="op">+</span><span class="st"> </span>mu_BC)<span class="op">*</span>B </a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">    dC &lt;-<span class="st"> </span>rho_C<span class="op">*</span>C <span class="op">+</span><span class="st"> </span>mu_AC<span class="op">*</span>A <span class="op">+</span><span class="st"> </span>mu_BC<span class="op">*</span>B <span class="op">-</span><span class="st"> </span>(mu_CA <span class="op">+</span><span class="st"> </span>mu_CB)<span class="op">*</span>C </a>
+<a class="sourceLine" id="cb1-8" data-line-number="8">    </a>
+<a class="sourceLine" id="cb1-9" data-line-number="9">    <span class="kw">return</span>(<span class="kw">list</span>(<span class="kw">c</span>(dA,dB,dC)))</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10">   }</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11">  ) </a>
+<a class="sourceLine" id="cb1-12" data-line-number="12">}</a></code></pre></div>
+<p>We will use this function to simulate some data using the <em>deSolve</em> library:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co">#define simulation parameter set</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">pars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">rho_A =</span> <span class="dv">0</span>, <span class="dt">rho_B =</span> <span class="dv">0</span>, <span class="dt">rho_C =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">          <span class="dt">mu_AB =</span> <span class="fl">0.2</span>, <span class="dt">mu_AC =</span> <span class="dv">0</span>, <span class="dt">mu_BA =</span> <span class="dv">0</span>, </a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">          <span class="dt">mu_CA =</span> <span class="dv">0</span>, <span class="dt">mu_BC =</span> <span class="fl">0.05</span>, <span class="dt">mu_CB =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#set initial values for cells</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">init.vals &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">A =</span> <span class="dv">100</span>, <span class="dt">B =</span> <span class="dv">0</span>, <span class="dt">C =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co">#simulate data</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="kw">library</span>(deSolve)</a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12">sim.data &lt;-<span class="st"> </span><span class="kw">lsoda</span>(<span class="dt">y =</span> init.vals, </a>
+<a class="sourceLine" id="cb2-13" data-line-number="13">                  <span class="dt">times =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span>, </a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">                  <span class="dt">func =</span> global.dynamics, </a>
+<a class="sourceLine" id="cb2-15" data-line-number="15">                  <span class="dt">parms =</span> pars)</a></code></pre></div>
+<p>Now, we will define the cost function for FAMoS:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co">#cost function for famos</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">cost.function &lt;-<span class="st"> </span><span class="cf">function</span>(parms, binary, data, inits){</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">  <span class="co">#simulate the data with the current parameter set</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">  fit.data &lt;-<span class="st"> </span><span class="kw">lsoda</span>(<span class="dt">y =</span> inits, </a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">                    <span class="dt">times =</span> <span class="dv">0</span><span class="op">:</span><span class="dv">10</span>, </a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">                    <span class="dt">func =</span> global.dynamics, </a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">                    <span class="dt">parms =</span> parms)</a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">  <span class="co">#calculate the aic</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">  ls2 &lt;-<span class="st"> </span><span class="kw">sum</span>((sim.data[,<span class="op">-</span><span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>fit.data[,<span class="op">-</span><span class="dv">1</span>])<span class="op">^</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb3-10" data-line-number="10">  out.aic &lt;-<span class="st"> </span>ls2 <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">sum</span>(binary <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb3-11" data-line-number="11">  </a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">  <span class="kw">return</span>(out.aic)</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">}</a></code></pre></div>
+<p>To call FAMoS, we need to specify a vector containing the names and the values of the start parameters. All that’s left is calling the model selection routine then. The fitting might take a couple of minutes. To see more of the model selection process, set <em>verbose = TRUE</em>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">library</span>(FAMoS)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">start.vals &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">rho_A =</span> <span class="fl">0.1</span>, <span class="dt">rho_B =</span> <span class="fl">0.1</span>, <span class="dt">rho_C =</span> <span class="fl">0.1</span>,</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">                <span class="dt">mu_AB =</span> <span class="fl">0.1</span>, <span class="dt">mu_AC =</span> <span class="fl">0.1</span>, <span class="dt">mu_BA =</span> <span class="fl">0.1</span>, </a>
+<a class="sourceLine" id="cb4-6" data-line-number="6">                <span class="dt">mu_CA =</span> <span class="fl">0.1</span>, <span class="dt">mu_BC =</span> <span class="fl">0.1</span>, <span class="dt">mu_CB =</span> <span class="fl">0.1</span>)</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8">famos.fit &lt;-<span class="st"> </span><span class="kw">famos</span>(<span class="dt">init.par =</span> start.vals,</a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">                   <span class="dt">fit.fn =</span> cost.function,</a>
+<a class="sourceLine" id="cb4-10" data-line-number="10">                   <span class="dt">homedir =</span> <span class="kw">tempdir</span>(),</a>
+<a class="sourceLine" id="cb4-11" data-line-number="11">                   <span class="dt">init.model.type =</span> <span class="kw">c</span>(<span class="st">&quot;rho_A&quot;</span>),</a>
+<a class="sourceLine" id="cb4-12" data-line-number="12">                   <span class="dt">data =</span> sim.data,</a>
+<a class="sourceLine" id="cb4-13" data-line-number="13">                   <span class="dt">inits =</span> init.vals)</a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb4-15" data-line-number="15"><span class="kw">print</span>(famos.fit)</a></code></pre></div>
+<h1 id="model-selection-based-on-logistic-regression-models">Model selection based on logistic regression models</h1>
+<p>There are many R packages available that tackle the problem of model selection based on regression models and FAMoS is not meant to replace them. However, it is also possible (and not even that difficult) to apply FAMoS to these kind of problems. For our example, we will use the birthwt data set from the <em>MASS</em> package, a standard test set for model selection. We will follow the modifications by Venables and Ripley in their book <em>Modern Applied Statistics with S-PLUS</em> and transform the data set in the following way before using it:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">library</span>(MASS)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="kw">attach</span>(birthwt)</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">race &lt;-<span class="st"> </span><span class="kw">factor</span>(race, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;white&quot;</span>,<span class="st">&quot;black&quot;</span>,<span class="st">&quot;other&quot;</span>))</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">ptd &lt;-<span class="st"> </span><span class="kw">factor</span>(ptl <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="kw">levels</span>(ftv)[<span class="op">-</span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)] &lt;-<span class="st"> &quot;2+&quot;</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7">bwt &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">low =</span> <span class="kw">factor</span>(low), age, lwt, race,</a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">                  <span class="dt">smoke =</span> (smoke<span class="op">&gt;</span><span class="dv">0</span>), ptd, <span class="dt">ht =</span> (ht<span class="op">&gt;</span><span class="dv">0</span>), <span class="dt">ui =</span>(ui<span class="op">&gt;</span><span class="dv">0</span>), ftv)</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="kw">detach</span>();<span class="kw">rm</span>(race,ptd,ftv)</a></code></pre></div>
+<p>Now, we want to perform a model selection based on logistic regression models with interactions. To this end, we will use the fitting routine <em>glm</em> instead of the standard optimiser <em>optim</em>, which is the default option in FAMoS. To tell FAMos, that we’re using a different optimiser, we will set the option <em>use.optim = FALSE</em> and since we don’t need multiple repeats with random starting values, we also set <em>optim.runs = 1</em>. Now, we need to supply and fitting function to FAMoS that - since we are using another fitting routine - needs to return a list, that contains the value of the selection criterion as well as the vector containing the names and the values of the fitted variables. As we will only work with the names in our example, having to return the parameter values might seem a bit clunky. However, as FAMoS is intended to offer a lot of flexibility, this feature is useful in many other cases (see below). Our fitting function looks like this:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">fit_func &lt;-<span class="st"> </span><span class="cf">function</span>(parms, data, binary){</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">  <span class="co">#First transform the parameter names into a formula. </span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">  <span class="co">#The to-be-fitted parameters are identified using the binary vector</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">  fitted.pars &lt;-<span class="st"> </span><span class="kw">names</span>(parms[<span class="kw">which</span>(binary <span class="op">==</span><span class="st"> </span><span class="dv">1</span>)])</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">  glm_formula &lt;-<span class="st"> </span><span class="kw">as.formula</span>(</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6">    <span class="kw">paste0</span>(<span class="st">&quot;low ~ &quot;</span>, <span class="kw">paste0</span>(fitted.pars, <span class="dt">collapse =</span> <span class="st">&quot;+&quot;</span>))</a>
+<a class="sourceLine" id="cb6-7" data-line-number="7">  )</a>
+<a class="sourceLine" id="cb6-8" data-line-number="8">  <span class="co">#fit the logistic model using glm</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9">  out &lt;-<span class="st"> </span><span class="kw">summary</span>(</a>
+<a class="sourceLine" id="cb6-10" data-line-number="10">    <span class="kw">glm</span>(glm_formula, </a>
+<a class="sourceLine" id="cb6-11" data-line-number="11">        <span class="dt">family =</span> <span class="kw">binomial</span>(<span class="dt">link =</span> logit),</a>
+<a class="sourceLine" id="cb6-12" data-line-number="12">        <span class="dt">data =</span> data</a>
+<a class="sourceLine" id="cb6-13" data-line-number="13">    )</a>
+<a class="sourceLine" id="cb6-14" data-line-number="14">  )</a>
+<a class="sourceLine" id="cb6-15" data-line-number="15">  </a>
+<a class="sourceLine" id="cb6-16" data-line-number="16">  <span class="co">#prepare output parameters, in this case only the names of the fitted </span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17">  <span class="co">#parameters are relevant. As FAMoS also expects values with these, we will just </span></a>
+<a class="sourceLine" id="cb6-18" data-line-number="18">  <span class="co">#return the value 1 for all parameters</span></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19">  out.par &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>, <span class="kw">length</span>(fitted.pars))</a>
+<a class="sourceLine" id="cb6-20" data-line-number="20">  <span class="kw">names</span>(out.par) &lt;-<span class="st"> </span>fitted.pars</a>
+<a class="sourceLine" id="cb6-21" data-line-number="21">  </a>
+<a class="sourceLine" id="cb6-22" data-line-number="22">  <span class="co">#return a list containing the first the selection criterion value and second the </span></a>
+<a class="sourceLine" id="cb6-23" data-line-number="23">  <span class="co">#vector of the fitted parameters</span></a>
+<a class="sourceLine" id="cb6-24" data-line-number="24">  <span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">SC =</span> out<span class="op">$</span>aic, <span class="dt">params =</span> out.par))</a>
+<a class="sourceLine" id="cb6-25" data-line-number="25">}</a></code></pre></div>
+<p>The only thing left is to specify the initial parameter vector. As we also want to have interactions, we need to create entries for all parameter combinations. Since <em>glm</em> expects them to be in the form of <em>par1:par2</em>, we will name the entries accordingly.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co">#first we define the available parameters. As the values are not important, we</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#will just set them equal to 1.</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">inits &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">age =</span> <span class="dv">1</span>, <span class="dt">lwt =</span> <span class="dv">1</span>, <span class="dt">race =</span> <span class="dv">1</span>, <span class="dt">smoke =</span> <span class="dv">1</span>, <span class="dt">ptd =</span> <span class="dv">1</span>, <span class="dt">ht =</span> <span class="dv">1</span>, <span class="dt">ui =</span> <span class="dv">1</span>, <span class="dt">ftv =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#Now, we calculate all possible interactions and name the corresponding vector</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#entries accordingly</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">combinations &lt;-<span class="st"> </span><span class="kw">combn</span>(<span class="kw">names</span>(inits),<span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(combinations)){</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8">  inits &lt;-<span class="st"> </span><span class="kw">c</span>(inits,<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb7-9" data-line-number="9">  <span class="kw">names</span>(inits)[i <span class="op">+</span><span class="st"> </span><span class="dv">8</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(combinations[<span class="dv">1</span>,i],<span class="st">&quot;:&quot;</span>,combinations[<span class="dv">2</span>,i])</a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">}</a></code></pre></div>
+<p>All that’s left is calling FAMoS now:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">library</span>(FAMoS)</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">famos.glm &lt;-<span class="st"> </span><span class="kw">famos</span>(<span class="dt">init.par =</span> inits,</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">                   <span class="dt">fit.fn =</span> fit_func,</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">                   <span class="dt">init.model.type =</span> <span class="kw">names</span>(inits[<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>]),</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5">                   <span class="dt">data =</span> bwt,</a>
+<a class="sourceLine" id="cb8-6" data-line-number="6">                   <span class="dt">use.optim =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb8-7" data-line-number="7">                   <span class="dt">optim.runs =</span> <span class="dv">1</span>)</a></code></pre></div>
+
+</body>
+</html>

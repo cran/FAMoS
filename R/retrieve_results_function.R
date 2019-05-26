@@ -5,11 +5,10 @@
 #' @param homedir  A string giving the directory in which the result folders are found. This is the same directory in which \code{\link{famos}} was run.
 #' @param all.names A vector containing the names of all parameters.
 #'
-#' @return A vector containing the calculated information criteria and estimated parameters of the specified model
+#' @return A vector containing the calculated selection criteria and estimated parameters of the specified model.
 #' @export
 #'
 #' @examples
-#' future::plan(future::sequential)
 #'
 #' #setting data
 #' x.values <- 1:7
@@ -33,18 +32,20 @@
 #' res <- famos(init.par = inits,
 #'             fit.fn = cost_function,
 #'             nr.of.data = length(y.values),
-#'             homedir = getwd(),
-#'             method = "forward",
+#'             homedir = tempdir(),
 #'             init.model.type = c("p2", "p3"),
 #'             optim.runs = 1,
 #'             x.vals = x.values,
 #'             y.vals = y.values)
 #'
 #' #get results
-#' retrieve.results(model = "01110", homedir = getwd())
-#' retrieve.results(model = c("p2", "p3", "p4"), homedir = getwd(),
+#' retrieve.results(model = "01110", homedir = tempdir())
+#' retrieve.results(model = c("p2", "p3", "p4"), homedir = tempdir(),
 #'                  all.names = c("p1","p2", "p3", "p4", "p5"))
-#' retrieve.results(model = c(0,1,1,1,0), homedir = getwd())
+#' retrieve.results(model = c(0,1,1,1,0), homedir = tempdir())
+#'
+#' #delete tempdir
+#' unlink(paste0(tempdir(),"/FAMoS-Results"), recursive = TRUE)
 retrieve.results <- function(model, homedir = getwd(), all.names = NULL){
   options(warn = -1)
   if(is.numeric(model)){
@@ -75,5 +76,5 @@ retrieve.results <- function(model, homedir = getwd(), all.names = NULL){
     stop("Supply a correct model definition.")
   }
   options(warn = 0)
- return(res)
+  return(res)
 }

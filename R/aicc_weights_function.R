@@ -13,6 +13,10 @@
 #' aicc.weights(input = famos.run)
 #' aicc.weights(input = famos.run, reorder = FALSE)
 aicc.weights <- function(input = getwd(), mrun = NULL, reorder = TRUE, save.output = NULL){
+  
+  old.par <- graphics::par("mai")
+  on.exit(graphics::par(mai = old.par))
+  
   if(is.character(input)){
     #read in files (either a specific one or all)
     if(is.null(mrun)){
@@ -39,56 +43,57 @@ aicc.weights <- function(input = getwd(), mrun = NULL, reorder = TRUE, save.outp
   }else{
     stop("Input needs to be either a directory path or a matrix.")
   }
-
+  
   if(length(which(is.finite(mt[1,]) == FALSE)) > 0){
     mt <- mt[,-which(is.finite(mt[1,]) == FALSE)]
   }
-
+  
   #calculate akaike weights
   akaike.weights <- as.numeric(exp(-0.5 * (mt[1,] - min(mt[1,])))/sum(exp(-0.5 * (mt[1,] - min(mt[1,])))))
   #calculate normalised probability
-  parms.support <- as.vector(as.matrix(mt[5:nrow(mt),]) %*% akaike.weights)
-  names(parms.support) <- row.names(mt[5:nrow(mt),])
+  parms.support <- as.vector(as.matrix(mt[3:nrow(mt),]) %*% akaike.weights)
+  names(parms.support) <- row.names(mt[3:nrow(mt),])
   if(reorder == TRUE){
     parms.order <- order(parms.support, decreasing = FALSE)
   }else{
     parms.order <- length(parms.support):1
   }
-
+  
   #adjust color scheme
-  best.model <- mt[-c(1:4),which.min(mt[1,])]
+  best.model <- mt[-c(1:2),which.min(mt[1,])]
   aicc.col <- rep("blue", length(best.model))
   aicc.col[which(best.model == 1)] <- "red"
   #adjust boldness of parameters
   aicc.bold <- rep(1, length(best.model))
   aicc.bold[which(best.model == 1)] <- 2
   #get parameter names
-  all.names <- rownames(mt)[5:nrow(mt)]
-
+  all.names <- rownames(mt)[3:nrow(mt)]
+  
   #save file if wanted
   if(is.null(save.output) == FALSE){
-
+    
     grDevices::pdf(file = save.output,
                    width  = 5,
                    height = 1.5 + 0.2*length(parms.support),
                    useDingbats = F)
-
+    
   }
-
-    graphics::par(mfrow = c(1,1),mai = c(1,0.3 + 0.08*max(nchar(all.names)),0.2,0.2))
-
-    graphics::barplot(parms.support[parms.order],
-                      horiz = T,
-                      names.arg = all.names[parms.order],
-                      las = 1,
-                      xlab = "relative support",
-                      col = aicc.col[parms.order],
-                      xlim = c(-0.02,1.02))
-    graphics::box()
-
+  
+  graphics::par(mai = c(1,0.3 + 0.08*max(nchar(all.names)),0.4,0.2))
+  
+  graphics::barplot(parms.support[parms.order],
+                    horiz = T,
+                    names.arg = all.names[parms.order],
+                    las = 1,
+                    xlab = "relative support",
+                    col = aicc.col[parms.order],
+                    xlim = c(-0.02,1.02),
+                    main = "Evidence ratio (only valid for AICc)")
+  graphics::box()
+  
   if(is.null(save.output) == FALSE){
     grDevices::dev.off()
   }
-
+  
   return(parms.support)
 }

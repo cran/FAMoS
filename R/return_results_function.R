@@ -1,24 +1,20 @@
 #' Return Final Results
 #'
-#' Returns the results of one FAMoS run. Includes the best parameter sets and corresponding information criterion.
+#' Returns the results of one FAMoS run. Includes the best parameter sets and corresponding selection criterion.
 #' @param homedir A string giving the directory in which the result folders are found. This is the same directory in which \code{\link{famos}} was run.
 #' @param mrun The number of the FAMoS run that is to be evaluated. Must be a three digit string in the form of '001'. Alternatively, supplying 'best' will return the best result that is found over several FAMoS runs.
-#' @param ic The information criterion used. Default is 'AICc". Other options are 'AIC' and 'BIC'.
 #' @return A list containing the following elements:
 #' \describe{
-#'   \item{IC}{The value of the information criterion of the best model.}
+#'   \item{SCV}{The value of the selection criterion of the best model.}
 #'   \item{par}{The values of the fitted parameter vector corresponding to the best model.}
-#'   \item{IC.type}{The type of information criterion used.}
 #'   \item{binary}{The binary information of the best model.}
 #'   \item{vector}{Vector indicating which parameters were fitted in the best model.}
 #'   \item{total.models.tested}{The total number of different models that were analysed. May include repeats.}
-#'   \item{mrun}{The number of the current FAMoS run}
-#'   \item{initial.mode}{The first model evaluated by the FAMoS run}
+#'   \item{mrun}{The number of the current FAMoS run.}
+#'   \item{initial.mode}{The first model evaluated by the FAMoS run.}
 #' }
 #' @export
 #' @examples
-#' future::plan(future::sequential)
-#'
 #' #setting data
 #' x.values <- 1:7
 #' y.values <-  3^2 * x.values^2 - exp(2 * x.values)
@@ -41,58 +37,91 @@
 #' res <- famos(init.par = inits,
 #'            fit.fn = cost_function,
 #'            nr.of.data = length(y.values),
-#'            homedir = getwd(),
-#'            method = "forward",
+#'            homedir = tempdir(),
 #'            init.model.type = c("p2", "p3"),
 #'            optim.runs = 1,
 #'            x.vals = x.values,
 #'            y.vals = y.values)
 #'
 #' #get results
-#' return.results(homedir = getwd(), mrun = res$mrun)
-return.results <- function(homedir, mrun, ic = "AICc"){
-  #get the according information criterion
-  switch (ic,
-          "AICc" = {ic.index <- 1},
-          "AIC"  = {ic.index <- 2},
-          "BIC"  = {ic.index <- 3}
-  )
+#' return.results(homedir = tempdir(), mrun = res$mrun)
+#'
+#' #delete tempdir
+#' unlink(paste0(tempdir(),"/FAMoS-Results"), recursive = TRUE)
+return.results <- function(homedir, mrun){
 
-  if(mrun == "best"){
-    best.ic <- Inf
-    filenames <- list.files(paste0(homedir,"/FAMoS-Results/BestModel"), pattern="*.rds", full.names=TRUE)
-    for(i in 1:length(filenames)){
-      bm <- readRDS(filenames[[i]])
-      if(bm[ic.index] < best.ic){
-        best.ic <- bm[ic.index]
+  mrun.old <- mrun
+  best.sc <- Inf
+  filenames <- list.files(paste0(homedir,"/FAMoS-Results/BestModel"), pattern="*.rds", full.names=TRUE)
+  for(i in 1:length(filenames)){
+    bm <- readRDS(filenames[[i]])
+    if(bm[1] < best.sc){
+      best.sc <- bm[1]
+      if(mrun.old == "best"){
         mrun <- gsub(paste0(homedir,"/FAMoS-Results/BestModel/BestModel"), "",filenames[[i]])
         mrun <- gsub(".rds", "", mrun)
       }
     }
   }
-  cat(paste0("FAMoS run ", mrun), sep = "\n")
-  #get information criterion of best model
-  bm <- readRDS(paste0(homedir, "/FAMoS-Results/BestModel/BestModel", mrun,".rds"))
-  cat(paste0(ic, " of best model: ", round(bm[ic], 2)), sep = "\n")
-  #get best model
-  mt <- readRDS(paste0(homedir, "/FAMoS-Results/TestedModels/TestedModels", mrun,".rds"))
-  min.index <- as.numeric(which(mt[ic.index,] == min(mt[ic.index,], na.rm = TRUE)))
 
-  cat(paste0("Best model (binary): ", paste(mt[-c(1:4), min.index], collapse="")), sep = "\n")
+  if(mrun.old == "best"){
+    #get information criterion of best model
+    cat(paste0("Selection criterion value of best model over all runs: ", round(best.sc, 2)), sep = "\n")
+    #get best model
+    filenames <- list.files(paste0(homedir,"/FAMoS-Results/TestedModels"), pattern="*.rds", full.names=TRUE)
+    mnumber <- 0
+    for(i in 1:length(filenames)){
+      mnumber <- mnumber + ncol(readRDS(filenames[i]))
+    }
+    mt <- readRDS(paste0(homedir, "/FAMoS-Results/TestedModels/TestedModels", mrun,".rds"))
+    min.index <- as.numeric(which(mt[1,] == min(mt[1,], na.rm = TRUE)))[1]
+    cat(paste0("Total number of tested models (might include duplicates): ",mnumber, sep = "\n"))
+    cat(paste0("Best model (binary): ", paste(mt[-c(1:2), min.index], collapse="")), sep = "\n")
 
-  cat("Best model (vector):", sep = "\n")
-  print(mt[-c(1:4), min.index])
-  cat("Estimated parameter values:", sep = "\n")
-  print(bm[-c(1:3)])
-  #save output as list
-  output <- list(IC = round(bm[ic], 2),
-                 par = bm[-c(1:3)],
-                 IC.type = ic,
-                 binary = paste(mt[-c(1:4), min.index], collapse=""),
-                 vector = mt[-c(1:4), min.index],
-                 total.models.tested = ncol(mt),
-                 mrun = mrun,
-                 initial.model = mt[-c(1:4),1])
+    cat("Selected parameters:", sep = "\n")
+    best.m <- mt[-c(1:2), min.index]
+    print(names(best.m[which(best.m == 1)]))
+    cat("Estimated parameter values:", sep = "\n")
+    print(bm[-1])
+    bm.out <- bm[-1]
+    #save output as list
+    output <- list(SCV = round(bm[1], 2),
+                   par = bm.out[which(best.m == 1)],
+                   binary = paste(mt[-c(1:2), min.index], collapse=""),
+                   vector = mt[-c(1:2), min.index],
+                   total.models.tested = ncol(mt),
+                   mrun = mrun,
+                   initial.model = mt[-c(1:2),1])
 
-  return(output)
+    return(output)
+  }else{
+    cat(paste0("\nFAMoS run ", mrun), sep = "\n")
+    #get information criterion of best model
+    bm <- readRDS(paste0(homedir, "/FAMoS-Results/BestModel/BestModel", mrun,".rds"))
+    cat(paste0("Selection criterion value of best model in this run: ", round(bm[1], 2)), sep = "\n")
+    cat(paste0("Selection criterion value of best model over all runs: ", round(best.sc, 2)), sep = "\n")
+    #get best model
+    mt <- readRDS(paste0(homedir, "/FAMoS-Results/TestedModels/TestedModels", mrun,".rds"))
+    min.index <- as.numeric(which(mt[1,] == min(mt[1,], na.rm = TRUE)))[1]
+    cat(paste0("Number of tested models during this run: ", ncol(mt)), sep = "\n")
+    cat(paste0("Best model (binary): ", paste(mt[-c(1:2), min.index], collapse="")), sep = "\n")
+
+    cat("Selected parameters:", sep = "\n")
+    best.m <- mt[-c(1:2), min.index]
+    print(names(best.m[which(best.m == 1)]))
+    cat("Estimated parameter values:", sep = "\n")
+    print(bm[-1])
+    bm.out <- bm[-1]
+    #save output as list
+    output <- list(SCV = round(bm[1], 2),
+                   par = bm.out[which(best.m == 1)],
+                   binary = paste(mt[-c(1:2), min.index], collapse=""),
+                   vector = mt[-c(1:2), min.index],
+                   total.models.tested = ncol(mt),
+                   mrun = mrun,
+                   initial.model = mt[-c(1:2),1])
+
+    return(output)
+  }
+
 }
