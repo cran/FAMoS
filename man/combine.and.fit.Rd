@@ -4,15 +4,14 @@
 \alias{combine.and.fit}
 \title{Combine and Fit Parameters}
 \usage{
-combine.and.fit(par, par.names, fit.fn, binary = NULL,
-  default.val = NULL, ...)
+combine.and.fit(par, par.names, fit.fn, binary = NULL, default.val = NULL, ...)
 }
 \arguments{
 \item{par}{A named vector containing all parameters that are supposed to be fitted.}
 
 \item{par.names}{The names of all parameters}
 
-\item{fit.fn}{The cost function (see \code{\link{famos}} for more details).}
+\item{fit.fn}{The cost or optimisation function (see \code{\link{famos}} for more details).}
 
 \item{binary}{A vector containing zeroes and ones. Zero indicates that the corresponding parameter is not fitted.}
 
@@ -21,7 +20,7 @@ combine.and.fit(par, par.names, fit.fn, binary = NULL,
 \item{...}{Other arguments.}
 }
 \value{
-Returns the negative log-likelihood as calculated by the specified cost function
+Returns the value calculated by the user-supplied cost or optimisation function
 }
 \description{
 Combines fitted and non-fitted parameters and calls the fitting function. Serves as a wrapping function for the user-specified fitting function \code{fit.fn} (see \code{\link{famos}}).

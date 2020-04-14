@@ -1,10 +1,10 @@
-## ----setup, include = FALSE, echo = FALSE--------------------------------
+## ----setup, include = FALSE, echo = FALSE-------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ----createdata, include = F, results='hide',warning=FALSE---------------
+## ----createdata, include = F, results='hide',warning=FALSE--------------------
 library(FAMoS)
 
 #setting data
@@ -45,10 +45,9 @@ res <- famos(init.par = inits,
              swap.parameters = swaps,
              init.model.type = c("p1", "p3"),
              optim.runs = 1,
-             data = sim.data,
-             future.off = TRUE) 
+             data = sim.data) 
 
-## ----createdata2, eval=FALSE---------------------------------------------
+## ----createdata2, eval=FALSE--------------------------------------------------
 #  library(FAMoS)
 #  
 #  #setting data
@@ -89,16 +88,15 @@ res <- famos(init.par = inits,
 #               swap.parameters = swaps,
 #               init.model.type = c("p1", "p3"),
 #               optim.runs = 1,
-#               data = sim.data,
-#               future.off = TRUE)
+#               data = sim.data)
 
 ## ----famosperformance, echo = T, fig.width = 4, fig.align= "center", fig.height=6----
 famos.performance(input = res$mrun, path = tempdir())
 
-## ----sc.order, echo = T, fig.width = 4, fig.align= "center", fig.height=4----
+## ----sc.order, echo = T, fig.width = 4, fig.align= "center", fig.height=4-----
  fig.sc <- sc.order(input = tempdir(), mrun = res$mrun)
 
-## ----sc.order2,echo = T, fig.width = 8, fig.align= "center", fig.height=4----
+## ----sc.order2,echo = T, fig.width = 8, fig.align= "center", fig.height=4-----
  par(mfrow = c(1,2))
  fig.sc1 <- sc.order(input = tempdir(), mrun = res$mrun, colour.par = "p1")
  fig.sc2 <- sc.order(input = tempdir(), mrun = res$mrun, colour.par = "p5")

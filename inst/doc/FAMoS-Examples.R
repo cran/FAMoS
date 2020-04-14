@@ -1,10 +1,10 @@
-## ----setup, include = TRUE, echo = FALSE---------------------------------
+## ----setup, include = TRUE, echo = FALSE--------------------------------------
 knitr::opts_chunk$set(
 collapse = TRUE,
 comment = "#>"
 )
 
-## ----globalode, eval = FALSE---------------------------------------------
+## ----globalode, eval = FALSE--------------------------------------------------
 #  #define the global model dynamics
 #  global.dynamics <- function(t,x,parms){
 #    with(as.list(c(x, parms)), {
@@ -19,7 +19,7 @@ comment = "#>"
 #  }
 #  
 
-## ----odesim, eval = FALSE------------------------------------------------
+## ----odesim, eval = FALSE-----------------------------------------------------
 #  #define simulation parameter set
 #  pars <- c(rho_A = 0, rho_B = 0, rho_C = 0.1,
 #            mu_AB = 0.2, mu_AC = 0, mu_BA = 0,
@@ -37,7 +37,7 @@ comment = "#>"
 #                    parms = pars)
 #  
 
-## ----costode, eval = FALSE-----------------------------------------------
+## ----costode, eval = FALSE----------------------------------------------------
 #  #cost function for famos
 #  cost.function <- function(parms, binary, data, inits){
 #    #simulate the data with the current parameter set
@@ -53,7 +53,7 @@ comment = "#>"
 #  }
 #  
 
-## ----odefamos, eval = FALSE----------------------------------------------
+## ----odefamos, eval = FALSE---------------------------------------------------
 #  
 #  library(FAMoS)
 #  
@@ -71,7 +71,7 @@ comment = "#>"
 #  print(famos.fit)
 #  
 
-## ----bwt, eval = FALSE---------------------------------------------------
+## ----bwt, eval = FALSE--------------------------------------------------------
 #  library(MASS)
 #  
 #  attach(birthwt)
@@ -83,7 +83,7 @@ comment = "#>"
 #  detach();rm(race,ptd,ftv)
 #  
 
-## ----glmfittingfunction, eval = FALSE------------------------------------
+## ----glmfittingfunction, eval = FALSE-----------------------------------------
 #  fit_func <- function(parms, data, binary){
 #    #First transform the parameter names into a formula.
 #    #The to-be-fitted parameters are identified using the binary vector
@@ -110,7 +110,7 @@ comment = "#>"
 #    return(list(SC = out$aic, params = out.par))
 #  }
 
-## ----glminits, eval = FALSE----------------------------------------------
+## ----glminits, eval = FALSE---------------------------------------------------
 #  #first we define the available parameters. As the values are not important, we
 #  #will just set them equal to 1.
 #  inits <- c(age = 1, lwt = 1, race = 1, smoke = 1, ptd = 1, ht = 1, ui = 1, ftv = 1)
@@ -122,7 +122,7 @@ comment = "#>"
 #    names(inits)[i + 8] <- paste0(combinations[1,i],":",combinations[2,i])
 #  }
 
-## ----glmfamos, eval = FALSE----------------------------------------------
+## ----glmfamos, eval = FALSE---------------------------------------------------
 #  library(FAMoS)
 #  famos.glm <- famos(init.par = inits,
 #                     fit.fn = fit_func,

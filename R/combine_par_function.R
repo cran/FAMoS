@@ -20,9 +20,7 @@ combine.par <- function(fit.par, all.names, default.val = NULL){
   if(length(which(all.names %in% names(fit.par))) != length(fit.par)){
     stop("The names of fit.par have to be included in all.names!")
   }
-  if(is.null(default.val) == FALSE && is.list(default.val) == FALSE){
-    stop("default.val has to be either NULL or a named list")
-  }
+
   all.par <- rep(0, length(all.names))
   names(all.par) <- all.names
   all.par[all.names %in% names(fit.par)] <- fit.par
@@ -38,11 +36,13 @@ combine.par <- function(fit.par, all.names, default.val = NULL){
       }else if(is.character(default.val[[k]])){#if character find the corresponding value
         #check if the corresponding entry is part of the fit vector
         if(is.element(default.val[[k]], names(fit.par))){
-          all.par[k] <- fit.par[which(names(fit.par) == default.val[[k]])]
+          all.par[k] <- fit.par[default.val[[k]]]
         }else{#if not take the value specified in nofit_zero
-          all.par[k] <- default.val[[which(names(default.val) == default.val[[k]])]]
+          all.par[k] <- default.val[[default.val[[k]]]]
         }
         
+      }else{
+        stop("Default values must either be character or numeric variables")
       }
     }
     return(all.par)
