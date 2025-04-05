@@ -45,7 +45,7 @@ famos(
 
 \item{refit}{If TRUE, previously tested models will be tested again. Default to FALSE.}
 
-\item{use.optim}{Logical. If true, the cost function \code{fit.fn} will be fitted via \code{\link{optim}}. If FALSE, the cost function will only be evaluated.}
+\item{use.optim}{Logical. If true, the cost function \code{fit.fn} will be fitted via \code{\link[stats]{optim}}. If FALSE, the cost function will only be evaluated.}
 
 \item{optim.runs}{The number of times that each model will be optimised. Default to 1. Numbers larger than 1 use random initial conditions (see \code{random.borders}).}
 
@@ -55,17 +55,17 @@ famos(
 
 \item{critical.parameters}{A list specifying sets of critical parameters. Critical sets are parameters sets, of which at least one parameter per set has to be present in each tested model. Default to NULL.}
 
-\item{random.borders}{The ranges from which the random initial parameter conditions for all \code{optim.runs} larger than one are sampled. Can be either given as a vector containing the relative deviations for all parameters or as a matrix containing in its first column the lower and in its second column the upper border values. Parameters are uniformly sampled based on \code{\link{runif}}. Default to 1 (100\% deviation of all parameters). Alternatively, functions such as \code{\link{rnorm}}, \code{\link{rchisq}}, etc. can be used if the additional arguments are passed along as well.}
+\item{random.borders}{The ranges from which the random initial parameter conditions for all \code{optim.runs} larger than one are sampled. Can be either given as a vector containing the relative deviations for all parameters or as a matrix containing in its first column the lower and in its second column the upper border values. Parameters are uniformly sampled based on \code{\link[stats]{runif}}. Default to 1 (100\% deviation of all parameters). Alternatively, functions such as \code{\link[stats]{rnorm}}, \code{\link[stats]{rchisq}}, etc. can be used if the additional arguments are passed along as well.}
 
-\item{control.optim}{Control parameters passed along to \code{optim}. For more details, see \code{\link{optim}}.}
+\item{control.optim}{Control parameters passed along to \code{optim}. For more details, see \code{\link[stats]{optim}}.}
 
-\item{parscale.pars}{Logical. If TRUE, the \code{parscale} option will be used when fitting with \code{\link{optim}}. This can help to speed up the fitting procedure, if the parameter values are on different scales. Default to FALSE.}
+\item{parscale.pars}{Logical. If TRUE, the \code{parscale} option will be used when fitting with \code{\link[stats]{optim}}. This can help to speed up the fitting procedure, if the parameter values are on different scales. Default to FALSE.}
 
 \item{con.tol}{The absolute convergence tolerance of each fitting run (see Details). Default is set to 0.1.}
 
 \item{save.performance}{Logical. If TRUE, the performance of \code{FAMoS} will be evaluated in each iteration via \code{\link{famos.performance}}, which will save the corresponding plots into the folder "FAMoS-Results/Figures/" (starting from iteration 3) and simultaneously show it on screen. Default to TRUE.}
 
-\item{use.futures}{Logical. If TRUE, FAMoS submits model evaluations via \code{futures}. For more information, see the \code{\link{future}} package.}
+\item{use.futures}{Logical. If TRUE, FAMoS submits model evaluations via \code{futures}. For more information, see the \code{\link[future]{future}} package.}
 
 \item{reattempt}{Logical. If TRUE, FAMoS will jump to a distant model, once the search methods are exhausted and continue from there. The algorithm terminates if the best model is encountered again or if all neighbouring models have been tested. If FALSE (default), FAMOS will terminate once the search methods are exhausted.}
 
@@ -75,7 +75,7 @@ famos(
 
 \item{verbose}{Logical. If TRUE, FAMoS will output all details about the current fitting procedure.}
 
-\item{...}{Other arguments that will be passed along to \code{\link{future}}, \code{\link{optim}} or the user-specified cost function \code{fit.fn}.}
+\item{...}{Other arguments that will be passed along to \code{\link[future]{future}}, \code{\link[stats]{optim}} or the user-specified cost function \code{fit.fn}.}
 }
 \value{
 A list containing the following elements:

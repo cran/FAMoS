@@ -48,47 +48,47 @@ res <- famos(init.par = inits,
              data = sim.data) 
 
 ## ----createdata2, eval=FALSE--------------------------------------------------
-#  library(FAMoS)
-#  
-#  #setting data
-#  true.p2 <- 3
-#  true.p5 <- 2
-#  sim.data <- cbind.data.frame(range = 1:10,
-#                               y = true.p2^2 * (1:10)^2 - exp(true.p5 * (1:10)))
-#  
-#  #define initial parameter values and corresponding test function
-#  inits <- c(p1 = 3, p2 = 4, p3 = -2, p4 = 2, p5 = 0)
-#  
-#  cost_function <- function(parms, binary, data){
-#    if(max(abs(parms)) > 5){
-#      return(NA)
-#    }
-#    with(as.list(c(parms)), {
-#      res <- p1*4 + p2^2*data$range^2 + p3*sin(data$range) + p4*data$range - exp(p5*data$range)
-#      diff <- sum((res - data$y)^2)
-#  
-#      #calculate AICC
-#      nr.par <- length(which(binary == 1))
-#      nr.data <- nrow(data)
-#      AICC <- diff + 2*nr.par + 2*nr.par*(nr.par + 1)/(nr.data - nr.par -1)
-#  
-#      return(AICC)
-#    })
-#  }
-#  
-#  
-#  #set swap set
-#  swaps <- list(c("p1", "p5"))
-#  
-#  #perform model selection
-#  res <- famos(init.par = inits,
-#               fit.fn = cost_function,
-#               homedir = tempdir(),
-#               method = "swap",
-#               swap.parameters = swaps,
-#               init.model.type = c("p1", "p3"),
-#               optim.runs = 1,
-#               data = sim.data)
+# library(FAMoS)
+# 
+# #setting data
+# true.p2 <- 3
+# true.p5 <- 2
+# sim.data <- cbind.data.frame(range = 1:10,
+#                              y = true.p2^2 * (1:10)^2 - exp(true.p5 * (1:10)))
+# 
+# #define initial parameter values and corresponding test function
+# inits <- c(p1 = 3, p2 = 4, p3 = -2, p4 = 2, p5 = 0)
+# 
+# cost_function <- function(parms, binary, data){
+#   if(max(abs(parms)) > 5){
+#     return(NA)
+#   }
+#   with(as.list(c(parms)), {
+#     res <- p1*4 + p2^2*data$range^2 + p3*sin(data$range) + p4*data$range - exp(p5*data$range)
+#     diff <- sum((res - data$y)^2)
+# 
+#     #calculate AICC
+#     nr.par <- length(which(binary == 1))
+#     nr.data <- nrow(data)
+#     AICC <- diff + 2*nr.par + 2*nr.par*(nr.par + 1)/(nr.data - nr.par -1)
+# 
+#     return(AICC)
+#   })
+# }
+# 
+# 
+# #set swap set
+# swaps <- list(c("p1", "p5"))
+# 
+# #perform model selection
+# res <- famos(init.par = inits,
+#              fit.fn = cost_function,
+#              homedir = tempdir(),
+#              method = "swap",
+#              swap.parameters = swaps,
+#              init.model.type = c("p1", "p3"),
+#              optim.runs = 1,
+#              data = sim.data)
 
 ## ----famosperformance, echo = T, fig.width = 4, fig.align= "center", fig.height=6----
 famos.performance(input = res$mrun, path = tempdir())

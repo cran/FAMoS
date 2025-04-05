@@ -8,22 +8,22 @@
 #' @param method The starting method of FAMoS. Options are "forward" (forward search), "backward" (backward elimination) and "swap" (only if \code{critical.parameters} or \code{swap.parameters} are supplied). Methods are adaptively changed over each iteration of FAMoS. Default to "forward".
 #' @param init.model.type The starting model. Options are "global" (starts with the complete model), "random" (creates a randomly sampled starting model) or "most.distant" (uses the model most dissimilar from all other previously tested models). Alternatively, a specific model can be used by giving the corresponding names of the parameters one wants to start with. Default to "random".
 #' @param refit If TRUE, previously tested models will be tested again. Default to FALSE.
-#' @param use.optim Logical. If true, the cost function \code{fit.fn} will be fitted via \code{\link{optim}}. If FALSE, the cost function will only be evaluated.
+#' @param use.optim Logical. If true, the cost function \code{fit.fn} will be fitted via \code{\link[stats]{optim}}. If FALSE, the cost function will only be evaluated.
 #' @param optim.runs The number of times that each model will be optimised. Default to 1. Numbers larger than 1 use random initial conditions (see \code{random.borders}).
 #' @param default.val A named list containing the values that the non-fitted parameters should take. If NULL, all non-fitted parameters will be set to zero. Default values can be either given by a numeric value or by the name of the corresponding parameter the value should be inherited from (NOTE: In this case the corresponding parameter entry has to contain a numeric value). Default to NULL.
 #' @param swap.parameters A list specifying which parameters are interchangeable. Each swap set is given as a vector containing the names of the respective parameters. Default to NULL.
 #' @param critical.parameters A list specifying sets of critical parameters. Critical sets are parameters sets, of which at least one parameter per set has to be present in each tested model. Default to NULL.
-#' @param random.borders The ranges from which the random initial parameter conditions for all \code{optim.runs} larger than one are sampled. Can be either given as a vector containing the relative deviations for all parameters or as a matrix containing in its first column the lower and in its second column the upper border values. Parameters are uniformly sampled based on \code{\link{runif}}. Default to 1 (100\% deviation of all parameters). Alternatively, functions such as \code{\link{rnorm}}, \code{\link{rchisq}}, etc. can be used if the additional arguments are passed along as well.
-#' @param control.optim Control parameters passed along to \code{optim}. For more details, see \code{\link{optim}}.
-#' @param parscale.pars Logical. If TRUE, the \code{parscale} option will be used when fitting with \code{\link{optim}}. This can help to speed up the fitting procedure, if the parameter values are on different scales. Default to FALSE.
+#' @param random.borders The ranges from which the random initial parameter conditions for all \code{optim.runs} larger than one are sampled. Can be either given as a vector containing the relative deviations for all parameters or as a matrix containing in its first column the lower and in its second column the upper border values. Parameters are uniformly sampled based on \code{\link[stats]{runif}}. Default to 1 (100\% deviation of all parameters). Alternatively, functions such as \code{\link[stats]{rnorm}}, \code{\link[stats]{rchisq}}, etc. can be used if the additional arguments are passed along as well.
+#' @param control.optim Control parameters passed along to \code{optim}. For more details, see \code{\link[stats]{optim}}.
+#' @param parscale.pars Logical. If TRUE, the \code{parscale} option will be used when fitting with \code{\link[stats]{optim}}. This can help to speed up the fitting procedure, if the parameter values are on different scales. Default to FALSE.
 #' @param con.tol The absolute convergence tolerance of each fitting run (see Details). Default is set to 0.1.
 #' @param save.performance Logical. If TRUE, the performance of \code{FAMoS} will be evaluated in each iteration via \code{\link{famos.performance}}, which will save the corresponding plots into the folder "FAMoS-Results/Figures/" (starting from iteration 3) and simultaneously show it on screen. Default to TRUE.
-#' @param use.futures Logical. If TRUE, FAMoS submits model evaluations via \code{futures}. For more information, see the \code{\link{future}} package.
-#' @param reattempt Logical. If TRUE, FAMoS will jump to a distant model, once the search methods are exhausted and continue from there. The algorithm terminates if the best model is encountered again or if all neighbouring models have been tested. If FALSE (default), FAMOS will terminate once the search methods are exhausted. 
+#' @param use.futures Logical. If TRUE, FAMoS submits model evaluations via \code{futures}. For more information, see the \code{\link[future]{future}} package.
+#' @param reattempt Logical. If TRUE, FAMoS will jump to a distant model, once the search methods are exhausted and continue from there. The algorithm terminates if the best model is encountered again or if all neighbouring models have been tested. If FALSE (default), FAMOS will terminate once the search methods are exhausted.
 #' @param log.interval The interval (in seconds) at which FAMoS informs about the current status, i.e. which models are still running and how much time has passed. Default to 600 (= 10 minutes).
 #' @param interactive.session Logical. If TRUE (default), FAMoS assumes it is running in an interactive session and users can supply input. If FALSE, no input is expected from the user, which can be helpful when running the script non-locally.
 #' @param verbose Logical. If TRUE, FAMoS will output all details about the current fitting procedure.
-#' @param ... Other arguments that will be passed along to \code{\link{future}}, \code{\link{optim}} or the user-specified cost function \code{fit.fn}.
+#' @param ... Other arguments that will be passed along to \code{\link[future]{future}}, \code{\link[stats]{optim}} or the user-specified cost function \code{fit.fn}.
 #' @details In each iteration, FAMoS finds all neighbouring models based on the current model and method, and subsequently tests them. If one of the tested models performs better than the current model, the model, but not the method, will be updated. Otherwise, the method, but not the model, will be adaptively changed, depending on the previously used methods.
 #'
 #' The cost function \code{fit.fn} can take the following inputs:
@@ -142,7 +142,7 @@ famos <- function(init.par,
   }
   if("future.off" %in% names(list(...))){
     .Deprecated(new = "use.futures", old = "future.off")
-    use.futures = ifelse(list(...)$future.off,  FALSE, TRUE) 
+    use.futures = ifelse(list(...)$future.off,  FALSE, TRUE)
   }
   if(use.futures == TRUE && class(try(future::plan()))[1] == "try-error"){
     stop("Please specify a plan from the future-package. See ?future::plan for more information.")
@@ -162,15 +162,15 @@ famos <- function(init.par,
   #create FAMoS directory
   cat("Create FAMoS directory...", sep = "\n")
   make.directories(homedir)
-  
+
   if(file.exists(paste0(homedir, "/FAMoS-Results/FAMoS-Info.rds"))){
-    
+
     old.session <- readRDS(paste0(homedir, "/FAMoS-Results/FAMoS-Info.rds"))
-    
+
     if(is.character(all.equal(fit.fn, old.session$fit.function))){
       if(interactive.session){
         user.input <- readline(cat("The previous results were generated by a different cost function and can potentially corrupt the results of the current run. This is assumed to be an interactive session (see option 'interactive.session')\n What should FAMoS do?\n 1: Continue anyway   2: Delete old results and continue   Any other key: Halt\nEnter number here:"))
-        
+
         switch (user.input,
                 "1" = {},
                 "2" = {unlink(paste0(homedir, "/FAMoS-Results"),recursive = TRUE)
@@ -234,7 +234,7 @@ famos <- function(init.par,
   if(!is.null(crit.parms) && !is.null(do.not.fit) && length(intersect(unlist(crit.parms), do.not.fit)) > 0){
     stop("The critical set contains parameters that are not supposed to be fitted. Please change either 'critical.parameters' or 'do.not.fit'!")
   }
-  
+
   #set scaling values
   scaling.values <- abs(init.par)
   scaling.values[scaling.values == 0] <- 1
@@ -311,7 +311,7 @@ famos <- function(init.par,
   }else{
     cat("Refitting disabled.", sep = "\n")
   }
-  
+
   #create logical and count variables for reattempts
   jumped <- FALSE
   exhausted <- FALSE
@@ -337,7 +337,7 @@ famos <- function(init.par,
       #set fitted parameters to 1 (curr.model is saved later)
       curr.model <- rep(0,length(init.par))
       curr.model[pick.model] <- 1
-      curr.model.all <- cbind(c(),curr.model)  
+      curr.model.all <- cbind(c(),curr.model)
 
       #set history
       previous <- method
@@ -673,7 +673,7 @@ famos <- function(init.par,
             waiting <- TRUE
           }else{
 
-            if(class(try(future::value(get(paste0("model", j)), std = FALSE))) == "try-error"){
+            if(methods::is(try(future::value(get(paste0("model", j)), std = FALSE)), "try-error")){
               stop(paste0("Future failed. The corresponding error message of job ",
                           paste(curr.model.all[,j], collapse=""),
                           " is shown above. If no output is shown, use 'use.futures = FALSE' to debug."))
@@ -778,7 +778,7 @@ famos <- function(init.par,
     #save the resulted SCVs
     SCV <- get.SCV[1,]
     save.SCV <- c(save.SCV, SCV)
-    
+
 
     #save SCVs with the corresponding models
     saveTestedModels <- rbind(save.SCV, models.per.run)
@@ -814,11 +814,11 @@ famos <- function(init.par,
                                "/FAMoS-Results/BestModel/BestModel",
                                mrun,
                                ".rds"))
-      
+
       jumped <- FALSE
 
     }else{# if it's not the first run, we know what the previous and current method are
-      
+
 
       if(curr.SCV < old.SCV ){#update the model if a better model is found
         old.SCV <- curr.SCV
@@ -899,11 +899,11 @@ famos <- function(init.par,
               break
             }else{
               if(old.SCV > min(save.SCV[1:previous.iteration])){
-                cat("\nThe best model during this run was worse than previous models. Continuing ...")  
+                cat("\nThe best model during this run was worse than previous models. Continuing ...")
               }else{
                 cat("\nThe best model during this run was better than previous models. Continuing ...")
               }
-              
+
             }
           }
           #jump to a distant model
@@ -927,13 +927,13 @@ famos <- function(init.par,
           #update previous methods
           method <- "forward"
           previous <- "swap"
-          
+
           #update jump run variables
           jumped <- TRUE
           exhausted <- FALSE
           previous.iteration <- ncol(saveTestedModels)
           jump.run <- jump.run + 1
-          
+
           #set initial parameters as best parameters
           best.par <- init.par
         }
@@ -941,8 +941,8 @@ famos <- function(init.par,
 
       }
     }
-    
-    
+
+
     #collect SCVs
     jumpSCV <- c(jumpSCV, old.SCV)
     #set appropriate data for reattempts
@@ -951,27 +951,27 @@ famos <- function(init.par,
     }else{
       additionalData <- NULL
     }
-    
+
     #save FAMoS performance
     if(ncol(saveTestedModels) > 3){
-      
+
       if(save.performance == T){
         famos.performance(input = saveTestedModels,
                           path = homedir,
-                          reattempts = additionalData, 
+                          reattempts = additionalData,
                           save.output = paste0(homedir,
                                                "/FAMoS-Results/Figures/Performance",
                                                mrun,
                                                ".pdf"))
       }
-      
+
       famos.performance(input = saveTestedModels,
                         path = homedir,
                         reattempts = additionalData)
-      
+
     }
 
-    
+
     #update model.run
     model.run <- model.run + 1
     timediff <- difftime(Sys.time(),start, units = "secs")[[1]]
@@ -983,11 +983,11 @@ famos <- function(init.par,
                sep = "\n"))
 
   }
-  
+
   #return the results
   cat("Best model found. Algorithm stopped.", sep = "\n")
   final.results <- return.results(homedir, mrun)
-  
+
   timediff <- difftime(Sys.time(),start, units = "secs")[[1]]
   cat(paste0("Time needed: ",
              sprintf("%02d:%02d:%02d",
@@ -995,26 +995,26 @@ famos <- function(init.par,
                      timediff %% 3600 %/% 60,  # minutes
                      timediff %% 60 %/% 1), # seconds,
              sep = "\n"))
-  
+
   graphics::par(mfrow = c(1,2))
   sc.order(input = saveTestedModels,
            mrun = mrun)
-  
+
   aicc.weights(input = saveTestedModels,
                mrun = mrun,
                reorder = TRUE)
-  
+
   if(save.performance == T){
     sc.order(input = saveTestedModels,
              mrun = mrun,
              save.output = paste0(homedir,"/FAMoS-Results/Figures/ModelComparison",mrun,".pdf"))
-    
+
     aicc.weights(input = saveTestedModels,
                  mrun = mrun,
                  reorder = TRUE,
                  save.output = paste0(homedir,"/FAMoS-Results/Figures/AkaikeWeights",mrun,".pdf"))
   }
-  
-  
+
+
   return(final.results)
 }
